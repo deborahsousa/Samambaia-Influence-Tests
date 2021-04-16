@@ -1,0 +1,13 @@
+experiment BatchMonthly model: '../models/Monthly_results.gaml'
+	type:batch
+	repeat: 1
+	autorun: true
+	keep_seed: true
+	benchmark: false
+	//until: (cycle = 440) 
+	
+{
+
+}
+
+

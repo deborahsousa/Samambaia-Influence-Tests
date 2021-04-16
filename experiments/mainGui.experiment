@@ -1,0 +1,158 @@
+experiment mainGui model: '../models/Main.gaml'
+	type:gui
+{
+	
+	output {
+		display 'Mapa da bacia' {
+			graphics map {
+				draw shape_file("../includes/shapes/bacia_samambaia.shp") as geometry 
+					color: #white 
+					border: #black;
+			}
+			
+			species CorregoRato;
+			species SamambaiaNorte;
+			species SamambaiaSul;
+
+			graphics rivers {
+				draw shape_file("../includes/shapes/rios_bacia.shp") as geometry color: #blue;			
+			}
+			
+			species Field;
+			
+			graphics "color_info" {
+				int x <- 15500;
+				int y <- 5000;
+				loop crop over: crops {
+					draw circle(600)
+						at: {x, y}
+						anchor: #center
+						color: crop.display_color
+					;
+					draw crop.name
+						at: {x + 800, y}
+						color: #black
+						anchor: #left_center
+						font: font("Helvetica", 14, #plain)
+					;
+					y <- y + 2400;
+				}
+			}
+		}
+		
+		display "Dados de cultivo" {
+			chart 'Faturamento total por cultura (R$)'
+				type: histogram
+				size: {1, 0.5}
+				position: {0, 0}
+				y_label: 'faturamento (bilhões de R$)'
+			{
+				loop crop over: crops {
+					data crop.name
+						value: total_revenue[crop.crop_number] / 1000000000
+						color: crop.display_color;
+				}
+			}
+			chart 'Produção total por cultura (kg)'
+				type: histogram
+				background: rgb('white')
+				size: {1, 0.5}
+				position: {0, 0.5}
+				y_label: 'produção (mil toneladas)'
+			{
+				loop crop over: crops {
+					data crop.name
+						value: total_production[crop.crop_number] / 1000000000
+						color: crop.display_color;
+				}
+			}
+		}
+		
+		display "Demanda de água" {
+			chart 'Córrego do Rato'
+				type: series
+				size: {1, 0.25}
+				position: {0, 0}
+				y_label: 'água (milhões de litros)'
+				x_label: 'tempo (dias)'
+			{
+				data "Oferta" value: CorregoRato[0].daily_supply / 1000000 color: #blue;
+				data "Demanda" value: CorregoRato[0].daily_demand / 1000000 color: #lightblue;
+			}
+			
+			chart 'Samambaia Norte'
+				type: series
+				size: {1, 0.25}
+				position: {0, 0.25}
+				y_label: 'água (milhões de litros)'
+				x_label: 'tempo (dias)'
+			{
+				data "Oferta" value: SamambaiaNorte[0].daily_supply / 1000000 color: #blue;
+				data "Demanda" value: SamambaiaNorte[0].daily_demand / 1000000 color: #lightblue;
+			}
+			
+			chart 'Samambaia Sul'
+				type: series
+				size: {1, 0.25}
+				position: {0, 0.5}
+				y_label: 'água (milhões de litros)'
+				x_label: 'tempo (dias)'
+			{
+				data "Oferta" value: SamambaiaSul[0].daily_supply / 1000000 color: #blue;
+				data "Demanda" value: SamambaiaSul[0].daily_demand / 1000000 color: #lightblue;
+			}
+			
+			chart "Total"
+				type: series
+				size: {1, 0.25}
+				position: {0, 0.75}
+				y_label: 'água (milhões de litros)'
+				x_label: 'tempo (dias)'
+			{
+				data "Disponibilidade diária" value: sum(collect(water_sources, each.daily_supply)) / 1000000 color: #blue;
+				data "Demanda diária" value: sum(collect(water_sources, each.daily_demand)) / 1000000 color: #lightblue;
+				
+			}
+		}
+
+		display "Patrimônio" {
+			chart 'Patrimônio total' 
+				type: series 
+				size: {1, 0.5} 
+				position: {0, 0}
+				y_label: 'patrimônio (bilhões de R$)'
+				x_label: 'tempo (dias)'
+			{
+				data 'Patrimônio total'
+					value: sum(Farmer collect (each.cash)) / 1000000000
+					color: #lightgreen;
+			}
+			
+			chart 'distribuição de patrimônio por categoria'
+				type: pie
+				size: {0.5, 0.5}
+				position: {0, 0.5}
+			{
+				data 'pequeno porte'
+					value: sum(Farmer where (each.number_of_fields <= 2) collect (each.cash)) / 1000000000;
+				data 'médio porte'
+					value: sum(Farmer where (each.number_of_fields > 2 and each.number_of_fields <= 8) collect (each.cash)) / 1000000000;
+				data 'grande porte'
+					value: sum(Farmer where (each.number_of_fields > 8) collect (each.cash)) / 1000000000;
+			}
+			
+			chart 'patrimônio médio por agricultor'
+				type: pie
+				size: {0.5, 0.5}
+				position: {0.5, 0.5}
+			{
+				data 'pequeno porte'
+					value: sum(Farmer where (each.number_of_fields <= 2) collect (each.cash)) / length(Farmer where(each.number_of_fields <= 2)) / 1000000000;
+				data 'médio porte'
+					value: sum(Farmer where (each.number_of_fields > 2 and each.number_of_fields <= 8) collect (each.cash)) / length(Farmer where(each.number_of_fields > 2 and each.number_of_fields <=8)) / 1000000000;
+				data 'grande porte'
+					value: sum(Farmer where (each.number_of_fields > 8) collect (each.cash)) / length(Farmer where(each.number_of_fields > 8)) / 1000000000;
+			}
+		}
+	}
+}

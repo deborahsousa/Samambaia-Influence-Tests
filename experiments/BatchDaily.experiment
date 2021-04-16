@@ -1,0 +1,14 @@
+experiment BatchDaily model: '../models/Main.gaml'
+	type:batch
+	autorun: false
+	keep_seed: true
+	benchmark: false
+	until: cycle = 100*1338 //n*1338, where n is the integer number of repetitions for each experiment
+
+{ 
+
+}
+	
+
+
+
