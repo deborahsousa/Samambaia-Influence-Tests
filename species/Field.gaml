@@ -51,6 +51,7 @@ species Field {
 		if (cycle_count = 1337){
 			production <- 0.0;
 			revenue <- 0.0;
+			farmer.cash <- 0.0;
 			total_revenue[0] <- 0.0;	
     		total_revenue[1] <- 0.0;
     		total_revenue[2] <- 0.0;

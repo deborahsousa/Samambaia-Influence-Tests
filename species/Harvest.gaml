@@ -7,6 +7,7 @@ species Harvest {
 	Crop crop;
 	int current_days <- 0 update: update_current_days();
 	int current_stage <- 0 update: calculate_current_stage();
+	bool has_changed_stage update: false;
 	float current_water_demand update: calculate_water_demand();
 	
 	action update_current_days type: int { //reinitiates every 1338 days
@@ -28,6 +29,10 @@ species Harvest {
 		} else {
 			return 3;
 		}
+		if (previous_stage != current_stage) {
+			has_changed_stage <- true;
+		}
+		
 	}
 	
 	action calculate_water_demand type: float {

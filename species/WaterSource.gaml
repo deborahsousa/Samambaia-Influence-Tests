@@ -7,7 +7,6 @@ species WaterSource {
 	float daily_demand update: calculate_daily_demand();
 	float total_demand update: total_demand + daily_demand;
 	float monthly_supply;
-	list<float> monthly_crop_area update: monthly_production();
 	matrix daily_weather <- csv_file("../includes/data/daily_weather.csv") as matrix;
 	int cycle_count <- 0 update: update_cycle_count();//cycle count of each simulation (for multiple simulations)
 	int current_day <- 1 update: update_current_day;
@@ -37,22 +36,6 @@ species WaterSource {
 		float monthly_flow <- flow_data[1, month_of_year] as float;
 		daily_supply <- monthly_flow * shape.area * 0.0864 * supply_inf;
 	}
-						
-	action monthly_production {		
-		if (current_day = 1 and irrigated_fields != nil){
-			list<float> new_monthly_area_per_crop <- list_with(8, 0.0);
-			loop field over: irrigated_fields {
-				if (field.current_harvest != nil and field.current_harvest.crop != nil) {
-					int crop_number <- field.current_harvest.crop.crop_number;
-					new_monthly_area_per_crop[crop_number] <- new_monthly_area_per_crop[crop_number] + field.shape.area;
-				}			
-			}
-			return new_monthly_area_per_crop;				
-		} else {
-			return monthly_crop_area;			
-
-		}
-	}	
 }
 
 species CorregoRato parent: WaterSource {

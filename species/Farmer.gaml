@@ -12,9 +12,13 @@ species Farmer {
 	int number_of_fields;
 	int initial_sow_day <- rnd(30);
 	float price_tolerance;
-	int max_simultaneous_crops <- 3;
+	int max_simultaneous_crops;
 	list private_data;
 	float my_area;
+	
+    reflex reinitiate_current_crops when: (cycle_count = 1337) {//returns to empty every 1338 runs
+		current_crops <- [];
+	}
 	
 	aspect {
 		draw envelope(fields);
@@ -65,11 +69,12 @@ species Farmer {
 		}		
 	}
 	
+	
 	reflex daily_payment {
 		float daily_cost;
 		loop field over: fields {
 			if (field.current_harvest != nil) {
-				if (cycle_count = 1337) { // reinitiates variable 'cash' for each 1338 cycle
+				if (cycle_count = 1337) { // reinitiates variable 'cash' every 1338 cycles
 					cash <- 0;
     			} else {
 					cash <- cash - field.daily_cost;

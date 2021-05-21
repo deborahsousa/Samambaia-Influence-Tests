@@ -68,6 +68,34 @@ experiment mainGui model: '../models/Main.gaml'
 			}
 		}
 		
+		display 'Dados diários' {
+			chart 'Área por cultura'
+				type: pie
+				background: rgb('white')
+				size: {1, 0.5}
+				position: {0, 0}
+			{
+				loop crop over: crops {
+					data crop.name
+						value: Field count (
+							each.current_harvest != nil and 
+							each.current_harvest.crop = crop
+						)
+						color: crop.display_color;
+				}
+			}
+			chart "Uso de água"
+				type: histogram
+				size: {1, 0.5}
+				position: {0, 0.5}
+				y_label: 'água (milhões de litros)'
+				x_label: 'tempo (dias)'
+			{
+				data "Oferta de água" value: sum(collect(water_sources, each.daily_supply)) / 1000000 color: #blue;
+				data "Demanda de água" value: sum(collect(water_sources, each.daily_demand)) / 1000000 color: #lightblue;
+			}
+		}		
+		
 		display "Demanda de água" {
 			chart 'Córrego do Rato'
 				type: series
@@ -134,11 +162,11 @@ experiment mainGui model: '../models/Main.gaml'
 				position: {0, 0.5}
 			{
 				data 'pequeno porte'
-					value: sum(Farmer where (each.number_of_fields <= 2) collect (each.cash)) / 1000000000;
+					value: sum(Farmer where (each.number_of_fields <= 10) collect (each.cash)) / 1000000000;
 				data 'médio porte'
-					value: sum(Farmer where (each.number_of_fields > 2 and each.number_of_fields <= 8) collect (each.cash)) / 1000000000;
+					value: sum(Farmer where (each.number_of_fields > 10 and each.number_of_fields <= 30) collect (each.cash)) / 1000000000;
 				data 'grande porte'
-					value: sum(Farmer where (each.number_of_fields > 8) collect (each.cash)) / 1000000000;
+					value: sum(Farmer where (each.number_of_fields > 30) collect (each.cash)) / 1000000000;
 			}
 			
 			chart 'patrimônio médio por agricultor'
@@ -147,11 +175,11 @@ experiment mainGui model: '../models/Main.gaml'
 				position: {0.5, 0.5}
 			{
 				data 'pequeno porte'
-					value: sum(Farmer where (each.number_of_fields <= 2) collect (each.cash)) / length(Farmer where(each.number_of_fields <= 2)) / 1000000000;
+					value: sum(Farmer where (each.number_of_fields <= 10) collect (each.cash)) / length(Farmer where(each.number_of_fields <= 10)) / 1000000000;
 				data 'médio porte'
-					value: sum(Farmer where (each.number_of_fields > 2 and each.number_of_fields <= 8) collect (each.cash)) / length(Farmer where(each.number_of_fields > 2 and each.number_of_fields <=8)) / 1000000000;
+					value: sum(Farmer where (each.number_of_fields > 10 and each.number_of_fields <= 30) collect (each.cash)) / length(Farmer where(each.number_of_fields > 10 and each.number_of_fields <=30)) / 1000000000;
 				data 'grande porte'
-					value: sum(Farmer where (each.number_of_fields > 8) collect (each.cash)) / length(Farmer where(each.number_of_fields > 8)) / 1000000000;
+					value: sum(Farmer where (each.number_of_fields > 30) collect (each.cash)) / length(Farmer where(each.number_of_fields > 30)) / 1000000000;
 			}
 		}
 	}

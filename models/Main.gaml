@@ -9,7 +9,7 @@ global {
 	
 	geometry shape <- shape_file("../includes/shapes/bacia_samambaia.shp") as geometry; //delimitating simulation area
 	float step <- 1 #day;
-    date starting_date <- date([2015,12,31]);
+    
     int cycle_count <- 0 update: update_cycle_count();//cycle count of each simulation (for multiple simulations)
     float supply_inf <- 1.0;//<- rnd(0.85,1.15) update:update_parameter();
     float number; //random number generated for each execution
@@ -121,29 +121,32 @@ global {
 			}
 		}
 		
-		create Farmer number: 10 { // farmers in corrego do rato
-			number_of_fields <- 2;
+		create Farmer number: 3 { // farmers in corrego do rato
+			number_of_fields <- 10;
 			price_tolerance <- price_tolerance_base + number_of_fields * price_tolerance_per_field;
-			location <- any_location_in(4000 around Field(246));
+			location <- any_location_in(10 around Field(246)); // field number is defined as the FID in shapefile attribute table
+			max_simultaneous_crops <- 2;
+			
 		}
-		
-		create Farmer number: 14 { // farmers in samambaia norte
-			number_of_fields <- 8;
+		create Farmer number: 5 { // farmers in samambaia norte
+			number_of_fields <- 30;
 			price_tolerance <- price_tolerance_base + number_of_fields * price_tolerance_per_field;
-			location <- any_location_in(4000 around Field(9));
+			location <- any_location_in(10 around Field(9)); 
+			max_simultaneous_crops <- 3;
+			
 		}
-		
-		create Farmer number: 6 { // farmers in samambaia sul
-			number_of_fields <- 25;
+		create Farmer number: 2 { // farmers in samambaia sul
+			number_of_fields <- 50;
 			price_tolerance <- price_tolerance_base + number_of_fields * price_tolerance_per_field;
-			location <- any_location_in(4000 around Field(118));			
+			location <- any_location_in(10 around Field(118));
+			max_simultaneous_crops <- 5;
 		}
-		
-		// relate farmers to fields
+				
+		// relates farmers to fields
 		loop farmer over: Farmer {
 			list<Field> empty_fields <- Field where (each.farmer = nil);
 			farmer.fields <- empty_fields closest_to (farmer, farmer.number_of_fields);
-			farmer.my_area <- sum(collect(farmer.fields, each.field_area)); 
+			farmer.my_area <- sum(collect(farmer.fields, each.field_area));
 			loop field over: farmer.fields {
 				field.farmer <- farmer;
 			}
@@ -169,7 +172,7 @@ global {
 		}	
 	
 		
-		/*reflex end_simulation when: cycle = 1338 { //pauses simulation for GUI Experiments
+		/*reflex end_simulation when: cycle = 2*1338 { //pauses simulation for GUI Experiments
 	
 		do pause;
 		
